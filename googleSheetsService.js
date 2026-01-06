@@ -1,17 +1,17 @@
 // googleSheetsService.js - Google Sheets Integration for User Authorization
 
 const { google } = require('googleapis');
+const config = require('./config');
 
 class GoogleSheetsService {
   constructor() {
-    // Hardcoded credentials for testing
-    // Replace these with your actual Google Service Account credentials
+    // Get credentials from environment variables
     this.credentials = {
-      client_email: 'YOUR_SERVICE_ACCOUNT_EMAIL@project.iam.gserviceaccount.com',
-      private_key: 'YOUR_PRIVATE_KEY_HERE'
+      client_email: config.googleServiceAccountEmail,
+      private_key: config.googlePrivateKey ? config.googlePrivateKey.replace(/\\n/g, '\n') : null
     };
     
-    this.sheetId = '1SbH3DLi1BhXEaafS7u6p-sTZ0ABvobKiQm8lA6cHgB8';
+    this.sheetId = config.googleSheetId;
     this.auth = null;
     this.sheets = null;
   }

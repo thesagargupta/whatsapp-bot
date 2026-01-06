@@ -1,5 +1,6 @@
 // index.js - Main WhatsApp Bot Application
 
+require('dotenv').config();
 const express = require('express');
 const config = require('./config');
 const whatsappService = require('./whatsappService');
@@ -84,21 +85,21 @@ app.post('/webhook', async (req, res) => {
 
 // Authorization check function
 async function checkAuthorization(phoneNumber) {
-  // For testing: Use mock authorization (hardcoded numbers)
-  // Replace with actual Google Sheets check when ready
-  
-  // Mock mode - returns true for testing
-  const TESTING_MODE = true; // Set to false to use Google Sheets
+  // Check if testing mode is enabled from environment variables
+  const TESTING_MODE = config.testingMode;
   
   if (TESTING_MODE) {
-    // Allow all numbers for testing
-    // Or use mock function: return await googleSheetsService.isUserAuthorizedMock(phoneNumber);
     console.log('Testing mode: Authorizing all users');
     return true;
   }
   
   // Production mode - check Google Sheets
-  return await googleSheetsService.isUserAuthorized(phoneNumber);
+  try {
+    return await googleSheetsService.isUserAuthorized(phoneNumber);
+  } catch (error) {
+    console.error('Authorization check error:', error);
+    return false;
+  }
 }
 
 // Test endpoint to send messages manually
