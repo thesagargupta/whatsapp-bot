@@ -15,6 +15,9 @@ const config = {
   googleServiceAccountEmail: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
   googlePrivateKey: process.env.GOOGLE_PRIVATE_KEY,
   
+  // Google Drive Configuration
+  googleDriveFolderId: process.env.GOOGLE_DRIVE_FOLDER_ID,
+  
   // Server Configuration
   port: process.env.PORT || 3000,
   

@@ -5,14 +5,15 @@ const express = require('express');
 const config = require('./config');
 const whatsappService = require('./whatsappService');
 const googleSheetsService = require('./googleSheetsService');
+const googleDriveService = require('./googleDriveService');
 const menuSystem = require('./menuSystem');
 
 const app = express();
 app.use(express.json());
 
-// Initialize Google Sheets (optional, can be skipped for testing)
-// Uncomment when you have valid Google credentials
+// Initialize Google Sheets and Google Drive
 googleSheetsService.initialize();
+googleDriveService.initialize();
 
 console.log('🤖 WhatsApp Bot Starting...');
 console.log('📋 Make sure to update config.js with your Meta credentials');
@@ -78,7 +79,31 @@ app.post('/webhook', async (req, res) => {
 
       // Process menu navigation
       const menuResponse = menuSystem.handleUserInput(from, messageText);
-      await whatsappService.sendMessage(from, menuResponse.text);
+      
+      // If submenu is selected, fetch and send Google Drive files
+      if (menuResponse.isSubmenu) {
+        console.log(`📂 Fetching files for user: ${from}, option: ${menuResponse.option}`);
+        
+        const files = await googleDriveService.getUserFolderFiles(from);
+        
+        if (files.length > 0) {
+          let fileMessage = `📚 *Here are your files:*\n\n`;
+          files.forEach((file, index) => {
+            fileMessage += `${index + 1}. ${file.name}\n${file.link}\n\n`;
+          });
+          fileMessage += `Type *back* to return to the menu.`;
+          
+          await whatsappService.sendMessage(from, fileMessage);
+        } else {
+          await whatsappService.sendMessage(
+            from, 
+            `❌ No files found in your folder.\n\nPlease contact admin or type *back* to return to menu.`
+          );
+        }
+      } else {
+        // Regular menu navigation
+        await whatsappService.sendMessage(from, menuResponse.text);
+      }
     }
 
     res.sendStatus(200);
