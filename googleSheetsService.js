@@ -36,7 +36,7 @@ class GoogleSheetsService {
   async isUserAuthorized(phoneNumber) {
     try {
       if (!this.sheets) {
-        console.log('Google Sheets not initialized, skipping authorization check');
+        console.log('❌ Google Sheets not initialized, denying authorization');
         return false;
       }
 
@@ -47,17 +47,27 @@ class GoogleSheetsService {
       });
 
       const rows = response.data.values || [];
-      const authorizedNumbers = rows.flat().map(num => num.trim());
+      const authorizedNumbers = rows.flat().map(num => String(num).trim());
+      
+      console.log('📋 Authorized numbers from sheet:', authorizedNumbers);
       
       // Clean phone number for comparison (remove +, spaces, etc.)
       const cleanNumber = phoneNumber.replace(/\D/g, '');
+      console.log('🔍 Checking phone number:', cleanNumber);
       
-      return authorizedNumbers.some(num => 
-        num.replace(/\D/g, '').includes(cleanNumber) || 
-        cleanNumber.includes(num.replace(/\D/g, ''))
-      );
+      // Check if the number matches any authorized number
+      const isMatch = authorizedNumbers.some(num => {
+        const cleanAuth = num.replace(/\D/g, '');
+        console.log('  Comparing with:', cleanAuth);
+        return cleanAuth === cleanNumber || 
+               cleanAuth.endsWith(cleanNumber) || 
+               cleanNumber.endsWith(cleanAuth);
+      });
+      
+      console.log('🎯 Match result:', isMatch);
+      return isMatch;
     } catch (error) {
-      console.error('Error checking user authorization:', error.message);
+      console.error('❌ Error checking user authorization:', error.message);
       return false;
     }
   }

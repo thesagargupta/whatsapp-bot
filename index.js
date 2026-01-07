@@ -88,14 +88,21 @@ async function checkAuthorization(phoneNumber) {
   // Check if testing mode is enabled from environment variables
   const TESTING_MODE = config.testingMode;
   
+  console.log('🔍 Authorization check for:', phoneNumber);
+  console.log('📊 Testing mode enabled:', TESTING_MODE);
+  console.log('📋 Google Sheet ID configured:', !!config.googleSheetId);
+  console.log('🔑 Google credentials configured:', !!config.googleServiceAccountEmail);
+  
   if (TESTING_MODE) {
-    console.log('Testing mode: Authorizing all users');
+    console.log('⚠️  Testing mode: Authorizing all users');
     return true;
   }
   
   // Production mode - check Google Sheets
   try {
-    return await googleSheetsService.isUserAuthorized(phoneNumber);
+    const isAuthorized = await googleSheetsService.isUserAuthorized(phoneNumber);
+    console.log('🔐 Google Sheets authorization result:', isAuthorized);
+    return isAuthorized;
   } catch (error) {
     console.error('Authorization check error:', error);
     return false;
