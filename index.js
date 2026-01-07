@@ -12,7 +12,7 @@ app.use(express.json());
 
 // Initialize Google Sheets (optional, can be skipped for testing)
 // Uncomment when you have valid Google credentials
-// googleSheetsService.initialize();
+googleSheetsService.initialize();
 
 console.log('🤖 WhatsApp Bot Starting...');
 console.log('📋 Make sure to update config.js with your Meta credentials');

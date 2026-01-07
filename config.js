@@ -19,7 +19,7 @@ const config = {
   port: process.env.PORT || 3000,
   
   // Testing mode
-  testingMode: process.env.TESTING_MODE === 'true' || true,
+  testingMode: process.env.TESTING_MODE === 'true',
 };
 
 // Validate required environment variables
