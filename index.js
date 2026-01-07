@@ -61,10 +61,15 @@ app.post('/webhook', async (req, res) => {
       
       if (!isAuthorized) {
         console.log(`❌ Unauthorized user: ${from}`);
-        await whatsappService.sendMessage(
-          from,
-          '🚫 *Unauthorized Access*\n\nSorry, your number is not registered in our system. Please contact the administrator to get access.'
-        );
+        try {
+          await whatsappService.sendMessage(
+            from,
+            '🚫 *Unauthorized Access*\n\nSorry, your number is not registered in our system. Please contact the administrator to get access.'
+          );
+        } catch (error) {
+          // Silently fail if Meta API doesn't allow sending to this number
+          console.log('⚠️  Could not send unauthorized message (Meta API restriction)');
+        }
         res.sendStatus(200);
         return;
       }
