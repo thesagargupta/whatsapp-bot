@@ -47,7 +47,10 @@ class GoogleSheetsService {
       });
 
       const rows = response.data.values || [];
-      const authorizedNumbers = rows.flat().map(num => String(num).trim());
+      // Filter out empty values and non-numeric entries (like headers)
+      const authorizedNumbers = rows.flat()
+        .map(num => String(num).trim())
+        .filter(num => /\d/.test(num)); // Only keep entries with at least one digit
       
       console.log('📋 Authorized numbers from sheet:', authorizedNumbers);
       
@@ -58,6 +61,11 @@ class GoogleSheetsService {
       // Check if the number matches any authorized number
       const isMatch = authorizedNumbers.some(num => {
         const cleanAuth = num.replace(/\D/g, '');
+        // Only match if cleanAuth is not empty and has valid length
+        if (!cleanAuth || cleanAuth.length < 10) {
+          console.log('  Skipping invalid entry:', num);
+          return false;
+        }
         console.log('  Comparing with:', cleanAuth);
         return cleanAuth === cleanNumber || 
                cleanAuth.endsWith(cleanNumber) || 
